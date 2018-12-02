@@ -23,12 +23,10 @@ suite =
                 \_ ->
                     Day02.partTwo partTwoExample
                         |> Expect.equal "fgij"
-            ]
-        , describe "hasCharAt"
-            [ test "1" <|
+            , test "real" <|
                 \_ ->
-                    Day02.hasCharAt 'b' 0 "bcd"
-                        |> Expect.equal True
+                    Day02.partTwo input
+                        |> Expect.equal ""
             ]
         ]
 
