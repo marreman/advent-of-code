@@ -1,6 +1,10 @@
-module Day01 exposing (findRepeatingValues, input, partOne, partTwo, toIntermediarySums)
+module Day01 exposing (input, partOne, partTwo)
 
 import Set exposing (Set)
+
+
+
+-- PART ONE
 
 
 partOne : String -> Int
@@ -8,26 +12,59 @@ partOne =
     parse >> List.sum
 
 
+
+-- PART TWO
+
+
 partTwo : String -> Int
 partTwo =
     parse >> partTwo_
 
 
-
--- IMPLEMENTATION
+type alias State =
+    { previousValue : Int
+    , seenValues : Set Int
+    , firstDuplicateValue : Maybe Int
+    }
 
 
 partTwo_ : List Int -> Int
 partTwo_ xs =
     let
-        firstRepeatingValue =
-            xs
-                |> toIntermediarySums
-                |> findRepeatingValues
-                |> Debug.log "repeating values"
-                |> List.head
+        initState : State
+        initState =
+            { previousValue = 0
+            , seenValues = Set.empty
+            , firstDuplicateValue = Nothing
+            }
+
+        handle : Int -> State -> State
+        handle operand state =
+            let
+                nextValue =
+                    operand + state.previousValue
+            in
+            { state
+                | previousValue = nextValue
+                , seenValues = Set.insert nextValue state.seenValues
+                , firstDuplicateValue =
+                    case state.firstDuplicateValue of
+                        Just value ->
+                            Just value
+
+                        Nothing ->
+                            if Set.member nextValue state.seenValues then
+                                Just nextValue
+
+                            else
+                                Nothing
+            }
+
+        resultingState : State
+        resultingState =
+            List.foldl handle initState xs
     in
-    case firstRepeatingValue of
+    case resultingState.firstDuplicateValue of
         Just value ->
             value
 
@@ -35,32 +72,51 @@ partTwo_ xs =
             partTwo_ (List.append xs xs)
 
 
-toIntermediarySums : List Int -> List Int
-toIntermediarySums =
-    let
-        getLatestValue =
-            List.head >> Maybe.withDefault 0
 
-        sumLatestValues currentValue values =
-            currentValue + getLatestValue values :: values
-    in
-    List.foldl sumLatestValues []
-        >> List.reverse
-
-
-findRepeatingValues : List Int -> List Int
-findRepeatingValues values =
-    values
-        |> List.indexedMap
-            (\i value1 ->
-                ( value1
-                , values
-                    |> List.indexedMap (\j value2 -> i /= j && value1 == value2)
-                    |> List.any ((==) True)
-                )
-            )
-        |> List.filter (Tuple.second >> (==) True)
-        |> List.map Tuple.first
+-- partTwo_ : List Int -> Int
+-- partTwo_ xs =
+--     let
+--         firstRepeatingValue =
+--             xs
+--                 |> toIntermediarySums
+--                 |> findRepeatingValues
+--                 |> Debug.log "repeating values"
+--                 |> List.head
+--     in
+--     case firstRepeatingValue of
+--         Just value ->
+--             value
+--
+--         Nothing ->
+--             partTwo_ (List.append xs xs)
+--
+--
+-- toIntermediarySums : List Int -> List Int
+-- toIntermediarySums =
+--     let
+--         getLatestValue =
+--             List.head >> Maybe.withDefault 0
+--
+--         sumLatestValues currentValue values =
+--             currentValue + getLatestValue values :: values
+--     in
+--     List.foldl sumLatestValues []
+--         >> List.reverse
+--
+--
+-- findRepeatingValues : List Int -> List Int
+-- findRepeatingValues values =
+--     values
+--         |> List.indexedMap
+--             (\i value1 ->
+--                 ( value1
+--                 , values
+--                     |> List.indexedMap (\j value2 -> i /= j && value1 == value2)
+--                     |> List.any ((==) True)
+--                 )
+--             )
+--         |> List.filter (Tuple.second >> (==) True)
+--         |> List.map Tuple.first
 
 
 parse : String -> List Int
