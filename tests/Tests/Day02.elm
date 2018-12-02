@@ -11,17 +11,30 @@ suite =
         [ describe "partOne"
             [ test "1" <|
                 \_ ->
-                    Day02.partOne example
+                    Day02.partOne partOneExample
                         |> Expect.equal 12
             , test "real" <|
                 \_ ->
                     Day02.partOne input
                         |> Expect.equal 7350
             ]
+        , describe "partTwo"
+            [ test "1" <|
+                \_ ->
+                    Day02.partTwo partTwoExample
+                        |> Expect.equal "fgij"
+            ]
+        , describe "hasCharAt"
+            [ test "1" <|
+                \_ ->
+                    Day02.hasCharAt 'b' 0 "bcd"
+                        |> Expect.equal True
+            ]
         ]
 
 
-example =
+partOneExample : String
+partOneExample =
     """
     abcdef
     bababc
@@ -30,6 +43,19 @@ example =
     aabcdd
     abcdee
     ababab
+    """
+
+
+partTwoExample : String
+partTwoExample =
+    """
+    abcde
+    fghij
+    klmno
+    pqrst
+    fguij
+    axcye
+    wvxyz
     """
 
 
