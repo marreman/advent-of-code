@@ -1,14 +1,78 @@
-module Day01 exposing (input, partOne)
+module Day01 exposing (findRepeatingValues, input, partOne, partTwo, toIntermediarySums)
+
+import Set exposing (Set)
 
 
 partOne : String -> Int
-partOne input_ =
-    input_
-        |> String.split "\n"
-        |> List.map String.trim
-        |> List.filter (String.isEmpty >> not)
-        |> List.map (String.toInt >> Maybe.withDefault 0)
-        |> List.sum
+partOne =
+    parse >> List.sum
+
+
+partTwo : String -> Int
+partTwo =
+    parse >> partTwo_
+
+
+
+-- IMPLEMENTATION
+
+
+partTwo_ : List Int -> Int
+partTwo_ xs =
+    let
+        firstRepeatingValue =
+            xs
+                |> toIntermediarySums
+                |> findRepeatingValues
+                |> Debug.log "repeating values"
+                |> List.head
+    in
+    case firstRepeatingValue of
+        Just value ->
+            value
+
+        Nothing ->
+            partTwo_ (List.append xs xs)
+
+
+toIntermediarySums : List Int -> List Int
+toIntermediarySums =
+    let
+        getLatestValue =
+            List.head >> Maybe.withDefault 0
+
+        sumLatestValues currentValue values =
+            currentValue + getLatestValue values :: values
+    in
+    List.foldl sumLatestValues []
+        >> List.reverse
+
+
+findRepeatingValues : List Int -> List Int
+findRepeatingValues values =
+    values
+        |> List.indexedMap
+            (\i value1 ->
+                ( value1
+                , values
+                    |> List.indexedMap (\j value2 -> i /= j && value1 == value2)
+                    |> List.any ((==) True)
+                )
+            )
+        |> List.filter (Tuple.second >> (==) True)
+        |> List.map Tuple.first
+
+
+parse : String -> List Int
+parse =
+    String.split "\n"
+        >> List.map String.trim
+        >> List.filter (String.isEmpty >> not)
+        >> List.map (String.toInt >> Maybe.withDefault 0)
+
+
+
+-- INPUT
 
 
 input =
