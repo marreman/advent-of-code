@@ -2,7 +2,6 @@ module Tests.Day01 exposing (suite)
 
 import Day01
 import Expect
-import Set exposing (Set)
 import Test exposing (..)
 
 
