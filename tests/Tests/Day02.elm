@@ -23,10 +23,11 @@ suite =
                 \_ ->
                     Day02.partTwo partTwoExample
                         |> Expect.equal "fgij"
-            , test "real" <|
-                \_ ->
-                    Day02.partTwo input
-                        |> Expect.equal ""
+            , only <|
+                test "real" <|
+                    \_ ->
+                        Day02.partTwo input
+                            |> Expect.equal "Just (\"wmlnjevbfodamyiqpuycrhsukg\",\"wmlnjevbfodamyiqpuecrhsukg\")"
             ]
         ]
 

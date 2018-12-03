@@ -75,125 +75,50 @@ summarizeResults results =
 -- PART TWO
 
 
-type alias Line =
-    { chars : String
-    , strikes : Int
-    }
-
-
-toLine : String -> Line
-toLine chars =
-    { chars = chars
-    , strikes = 0
-    }
-
-
 partTwo : String -> String
 partTwo input =
     let
         lines =
             input
                 |> parse
-                |> List.map toLine
-
-        length =
-            lines
-                |> List.head
-                |> Maybe.map (.chars >> String.length)
-                |> Maybe.withDefault 0
-
-        forEachChar f =
-            List.map f (List.range 0 (length - 1))
     in
-    (forEachChar <|
-        \index ->
-            lines
-                |> List.map (testIndex index lines)
-    )
-        -- |> List.map (List.foldl flatten Dict.empty)
-        |> flatten
-        |> Dict.filter (\k v -> v == 1)
-        -- |> Debug.log "output"
+    lines
+        |> findMatch
         |> Debug.toString
 
 
-flatten : List (List Line) -> Dict String Int
-flatten lines =
-    lines
-        |> List.map
-            (List.foldl
-                (\{ chars, strikes } result ->
-                    result
-                        |> Dict.insert chars
-                            (result
-                                |> Dict.get chars
-                                |> Maybe.withDefault 0
-                                |> (+) strikes
-                            )
-                )
-                Dict.empty
-            )
-        |> List.foldl
-            (\dict result ->
-                Dict.foldl
-                    (\chars strikes result_ ->
-                        result_
-                            |> Dict.insert chars
-                                (result_
-                                    |> Dict.get chars
-                                    |> Maybe.withDefault 0
-                                    |> (+) strikes
-                                )
-                    )
-                    result
-                    dict
-            )
-            Dict.empty
+findMatch : List String -> Maybe ( String, String )
+findMatch lines =
+    case lines of
+        head :: tail ->
+            case search head tail of
+                Just matches ->
+                    Just matches
+
+                Nothing ->
+                    findMatch tail
+
+        [] ->
+            Nothing
 
 
-
--- flatten =
---     \line dict ->
---         let
---             strikes =
---                 Dict.get line.chars dict
---         in
---         Dict.insert line.chars
---             ((strikes
---                 |> Maybe.withDefault 0
---              )
---                 + line.strikes
---             )
---             dict
-
-
-testIndex : Int -> List Line -> Line -> Line
-testIndex index lines line =
-    let
-        hasSameChar =
-            lines
-                |> List.filter (.chars >> (/=) line.chars)
-                |> List.map
-                    (.chars
-                        >> (\chars ->
-                                sameCharAt index line.chars chars
-                           )
-                    )
-                |> List.any ((==) True)
-    in
-    { line
-        | strikes =
-            if hasSameChar then
-                line.strikes
+search : String -> List String -> Maybe ( String, String )
+search needle haystack =
+    case haystack of
+        line :: rest ->
+            if isMatch needle line then
+                Just ( needle, line )
 
             else
-                line.strikes + 1
-    }
+                search needle rest
+
+        [] ->
+            Nothing
 
 
-charAt index =
-    String.toList >> Array.fromList >> Array.get index >> Maybe.withDefault '_'
-
-
-sameCharAt index line1 line2 =
-    charAt index line1 == charAt index line2
+isMatch : String -> String -> Bool
+isMatch string1 string2 =
+    List.map2 (==) (String.toList string1) (String.toList string2)
+        |> List.filter ((==) False)
+        |> List.length
+        |> (==) 1
