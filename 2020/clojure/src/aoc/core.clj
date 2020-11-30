@@ -1,6 +1,10 @@
-(ns aoc.core)
+(ns aoc.core
+  (:require [clojure.string :as str]))
 
-(slurp "../input/dummy")
+(def input (slurp "../input/dummy"))
+
+(-> (str/trim input)
+    (str/split #","))
 
 (+ 1 1)
 
