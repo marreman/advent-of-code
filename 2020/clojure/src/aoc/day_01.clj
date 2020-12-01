@@ -15,7 +15,7 @@
           :when (= 2020 (+ x y))]
       (* x y))))
 
-;; Courtesy of https://github.com/mariana-bocoi
+;; Courtesy of https://github.com/nicevo
 (defn part-1-alt []
   (let [xs (set input)
         ys (set (map #(- 2020 %) xs))]
