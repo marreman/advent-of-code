@@ -15,10 +15,11 @@
           :when (= 2020 (+ x y))]
       (* x y))))
 
+;; Courtesy of https://github.com/mariana-bocoi
 (defn part-1-alt []
-  (let [a (set input)
-        b (set (map #(- 2020 %) a))]
-    (apply * (set/intersection a b))))
+  (let [xs (set input)
+        ys (set (map #(- 2020 %) xs))]
+    (apply * (set/intersection xs ys))))
 
 (defn part-2 []
   (distinct
