@@ -11,25 +11,25 @@
 
 (defn parse-policy [s]
   (let [regex #"^(\d+)-(\d+) (\w): (\w+)$"
-        [_ n1 n2 char phrase] (re-find regex s)]
+        [_ n1 n2 char password] (re-find regex s)]
     [(str->int n1)
      (str->int n2)
      (first char)
-     phrase]))
+     password]))
 
-(defn count-valid-phrases [predicate]
+(defn count-valid-passwords [predicate]
   (count (filter (comp predicate parse-policy) input)))
 
 (defn part-1 []
-  (count-valid-phrases
-    (fn [[n1 n2 char phrase]]
-      (<= n1 (count (filter (partial = char) phrase)) n2))))
+  (count-valid-passwords
+    (fn [[n1 n2 char password]]
+      (<= n1 (count (filter (partial = char) password)) n2))))
 
 (defn part-2 []
-  (count-valid-phrases
-    (fn [[n1 n2 char phrase]]
-      (xor (= char (get phrase (dec n1)))
-           (= char (get phrase (dec n2)))))))
+  (count-valid-passwords
+    (fn [[n1 n2 char password]]
+      (xor (= char (get password (dec n1)))
+           (= char (get password (dec n2)))))))
 
 (part-1) ;; 572
 (part-2) ;; 306
