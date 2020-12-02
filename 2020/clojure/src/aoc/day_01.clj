@@ -1,12 +1,12 @@
 (ns aoc.day-01
-  (:require [aoc.util :as util]
+  (:require [aoc.util :refer [lines str->int]]
             [clojure.set :as set]))
 
 (def sample
   [1721 979 366 299 675 1456])
 
 (def input
-  (map util/str->int (util/lines (slurp "../input/01"))))
+  (map str->int (lines (slurp "../input/01"))))
 
 (defn part-1 []
   (distinct
@@ -28,3 +28,6 @@
           z input
           :when (= 2020 (+ x y z))]
       (* x y z))))
+
+(part-1) ;; 877971
+(part-2) ;; 203481432
