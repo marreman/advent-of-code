@@ -9,36 +9,27 @@
 (def input
   (util/lines (slurp "../input/02")))
 
-(defn valid-password? [s]
-  (let [[_ min max char password] (re-find #"^(\d+)-(\d+) (\w): (\w+)$" s)
-        found-chars (filter #(= char (str %)) password)]
-    (<= (util/str->int min) (count found-chars) (util/str->int max))))
+(defn- parse-policy [s]
+  (let [regex #"^(\d+)-(\d+) (\w): (\w+)$"
+        [_ n1 n2 char phrase] (re-find regex s)]
+    [(util/str->int n1)
+     (util/str->int n2)
+     (first char)
+     phrase]))
+
+(defn valid-password? [[n1 n2 char phrase]]
+  (let [char-count (count (filter (partial = char) phrase))]
+    (<= n1 char-count n2)))
 
 (defn part-1 []
-  (count (filter valid-password? input)))
+  (count (filter (comp valid-password? parse-policy) input)))
 
-(defn xor [x y]
-  (and (or x y)
-       (not= x y)))
-
-(defn valid-password-2? [s]
-  (let [matcher (re-matcher #"\d+|\w+" s)
-        pos-1 (dec (util/str->int (re-find matcher)))
-        pos-2 (dec (util/str->int (re-find matcher)))
-        char (first (re-find matcher))
-        phrase (re-find matcher)]
-    (pr (get phrase pos-1))
-    (pr (get phrase pos-2))
-    (xor (= char (get phrase pos-1))
-         (= char (get phrase pos-2)))))
+(defn valid-password-2? [[n1 n2 char phrase]]
+  (util/xor (= char (get phrase (dec n1)))
+            (= char (get phrase (dec n2)))))
 
 (defn part-2 []
-  (map (fn [p] {:policy p, :valid? (valid-password-2? p)}) input))
+  (count (filter (comp valid-password-2? parse-policy) input)))
 
-;; (valid-password-2? (first sample))
-;; (valid-password-2? (second sample))
-;; (valid-password-2? (last sample))
-(valid-password-2? "14-15 d: dddddddddddddjmd")
-(valid-password-2? "6-7 q: xqqqqqgq")
-(part-2)
-(count (filter :valid? (part-2)))
+(part-1) ;; 572
+(part-2) ;; 306
