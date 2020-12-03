@@ -17,19 +17,22 @@
 (def input
   (lines (slurp "../input/03")))
 
-(defn part-1 [m d-pos]
-  (loop [[x y] [0 0], r '()]
-    (if-let [row (get m y)]
-      (recur (map + [x y] d-pos)
-             (conj r (nth (cycle row) x)))
-      ((frequencies r) \#))))
+(defn traverse [map' step]
+  (loop [[x y] [0 0], seen '()]
+    (if-let [row (get map' y)]
+      (recur (map + [x y] step)
+             (conj seen (nth (cycle row) x)))
+      (get (frequencies seen) \#))))
 
-(defn part-2 [m]
-  (* (part-1 m [1 1])
-     (part-1 m [3 1])
-     (part-1 m [5 1])
-     (part-1 m [7 1])
-     (part-1 m [1 2])))
+(defn part-1 [map']
+  (traverse map' [3 1]))
 
-(part-1 input [3 1]) ;; 159
+(defn part-2 [map']
+  (* (traverse map' [1 1])
+     (traverse map' [3 1])
+     (traverse map' [5 1])
+     (traverse map' [7 1])
+     (traverse map' [1 2])))
+
+(part-1 input) ;; 159
 (part-2 input) ;; 6419669520
