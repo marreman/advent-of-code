@@ -17,13 +17,12 @@
 (def input
   (lines (slurp "../input/03")))
 
-(defn part-1 [m [dx dy]]
-  (loop [x 0, y 0, r 0]
+(defn part-1 [m d-pos]
+  (loop [[x y] [0 0], r '()]
     (if-let [row (get m y)]
-      (case (nth (cycle row) x)
-        \. (recur (+ x dx) (+ y dy) r)
-        \# (recur (+ x dx) (+ y dy) (+ r 1)))
-      r)))
+      (recur (map + [x y] d-pos)
+             (conj r (nth (cycle row) x)))
+      ((frequencies r) \#))))
 
 (defn part-2 [m]
   (* (part-1 m [1 1])
