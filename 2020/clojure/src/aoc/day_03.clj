@@ -34,5 +34,7 @@
      (traverse map' [7 1])
      (traverse map' [1 2])))
 
+(part-1 sample) ;; 7
 (part-1 input) ;; 159
+(part-2 sample) ;; 336
 (part-2 input) ;; 6419669520
