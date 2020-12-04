@@ -15,3 +15,6 @@
 (defn xor [x y]
   (and (or x y)
        (not= x y)))
+
+(defn map-fns [fns coll]
+  (map (fn [fn' x] (fn' x)) fns coll))

@@ -1,5 +1,5 @@
 (ns aoc.day-04
-  (:require [aoc.util :refer [str->int]]
+  (:require [aoc.util :refer [str->int map-fns]]
             [clojure.string :as str]
             [clojure.spec.alpha :as s]))
 
@@ -33,25 +33,23 @@
 (s/def ::hcl #(re-matches #"#[a-f0-9]{6}" %))
 (s/def ::ecl #{"amb" "blu" "brn" "gry" "grn" "hzl" "oth"})
 (s/def ::pid #(re-matches #"\d{9}" %))
-(s/def ::cid string?)
 
 (s/def ::passport
-  (s/keys :req-un [::byr ::ecl ::eyr ::hcl ::hgt ::iyr ::pid]
-          :opt-un [::cid]))
+  (s/keys :req-un [::byr ::ecl ::eyr ::hcl ::hgt ::iyr ::pid]))
 
-(defn parse-pair [s]
-  (let [[string-key val] (str/split s #":")
-        key (keyword string-key)]
-    [key val]))
+(defn parse-field [field]
+  (map-fns [keyword identity] (str/split field #":")))
 
-(defn parse [passport]
+(defn parse-passport [passport]
   (->> (str/split passport #"\s+")
-       (mapcat parse-pair)
+       (mapcat parse-field)
        (apply sorted-map)))
 
 (defn part-2 [passports]
-  (count (filter #(s/valid? ::passport %) (map parse passports))))
+  (->> (map parse-passport passports)
+       (filter #(s/valid? ::passport %))
+       count))
 
-;; See commit 57a752e for part 1, it's a simpler version of this.
+;; See commit 57a752e for part 1, it's basically a simpler version of part one.
 (part-2 sample) ;; 2
 (part-2 input) ;; 116
