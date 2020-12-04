@@ -1,5 +1,6 @@
 (ns aoc.day-04
-  (:require [clojure.string :as str]
+  (:require [aoc.util :refer [str->int]]
+            [clojure.string :as str]
             [clojure.spec.alpha :as s]))
 
 (def sample
@@ -20,30 +21,37 @@
 (def input
   (str/split (slurp "../input/04") #"\n\n"))
 
-(s/def ::byr string?)
+(s/def ::byr #(<= 1920 (str->int %) 2002))
+(s/def ::iyr #(<= 2010 (str->int %) 2020))
+(s/def ::eyr #(<= 2020 (str->int %) 2030))
+(s/def ::hgt (fn [s]
+               (let [[_ n unit] (re-find #"(\d+)(cm|in)" s)]
+                 (case unit
+                   "cm" (<= 150 (str->int n) 193)
+                   "in" (<= 59 (str->int n) 76)
+                   false))))
+(s/def ::hcl #(re-matches #"#[a-f0-9]{6}" %))
+(s/def ::ecl #{"amb" "blu" "brn" "gry" "grn" "hzl" "oth"})
+(s/def ::pid #(re-matches #"\d{9}" %))
 (s/def ::cid string?)
-(s/def ::ecl string?)
-(s/def ::eyr string?)
-(s/def ::hcl string?)
-(s/def ::hgt string?)
-(s/def ::iyr string?)
-(s/def ::pid string?)
 
 (s/def ::passport
   (s/keys :req-un [::byr ::ecl ::eyr ::hcl ::hgt ::iyr ::pid]
           :opt-un [::cid]))
 
 (defn parse-pair [s]
-  (let [[key val] (str/split s #":")]
-    [(keyword key) val]))
+  (let [[string-key val] (str/split s #":")
+        key (keyword string-key)]
+    [key val]))
 
 (defn parse [passport]
   (->> (str/split passport #"\s+")
        (mapcat parse-pair)
        (apply sorted-map)))
 
-(defn part-1 [passports]
+(defn part-2 [passports]
   (count (filter #(s/valid? ::passport %) (map parse passports))))
 
-(part-1 sample) ;; 2
-(part-1 input) ;; 200
+;; See commit 57a752e for part 1, it's a simpler version of this.
+(part-2 sample) ;; 2
+(part-2 input) ;; 116
