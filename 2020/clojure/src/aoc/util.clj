@@ -2,7 +2,7 @@
   (:require [clojure.string :as str]))
 
 (defn log [x]
-  (pr x)
+  (prn x)
   x)
 
 (defn lines [s]
