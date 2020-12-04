@@ -50,6 +50,6 @@
        (filter #(s/valid? ::passport %))
        count))
 
-;; See commit 57a752e for part 1, it's basically a simpler version of part one.
+;; See commit 57a752e for part 1, it's basically a simpler version of part 2.
 (part-2 sample) ;; 2
 (part-2 input) ;; 116
