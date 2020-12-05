@@ -1,38 +1,43 @@
-(ns aoc.day-05)
+(ns aoc.day-05
+  (:require [aoc.util :refer [lines]]))
 
 (def sample-1 "FBFBBFFRLR")
 (def sample-2 "BFFFBBFRRR")
 (def sample-3 "FFFBBBFRRR")
 (def sample-4 "BBFFBBFRLL")
 
-(defn find-row [[c & cs] lower upper]
-  (let [middle (+ (quot (- upper lower) 2) lower)]
-    (prn {:c c, :cs cs, :lower lower, :middle middle, :upper upper})
-    (if (empty? cs)
-      middle
-      (case c
-        \F (find-row cs lower middle)
-        \B (find-row cs middle upper)))))
+(def input (lines (slurp "../input/05")))
 
-(comment
-  (find-row (take 7 sample-1) 0 127)
-  (find-row (take 7 sample-2) 0 127)
-  (find-row (take 7 sample-3) 0 127)
-  (find-row (take 7 sample-4) 0 127)
-  )
+(defn find' [[c & cs] rows]
+  (let [[lower upper] (split-at (quot (count rows) 2) rows)]
+    (case c
+      \F (find' cs lower)
+      \L (find' cs lower)
+      \B (find' cs upper)
+      \R (find' cs upper)
+      (first rows))
+    ))
 
-(defn find-column [[c & cs] lower upper]
-  (let [middle (+ (quot (- upper lower) 2) lower)]
-    (prn {:c c, :cs cs, :lower lower, :middle middle, :upper upper})
-    (if (empty? cs)
-      middle
-      (case c
-        \L (find-column cs lower middle)
-        \R (find-column cs middle upper)))))
+(find' (take 7 sample-1) (range 128))
+(find' (take 7 sample-2) (range 128))
+(find' (take 7 sample-3) (range 128))
 
-(comment
-  (find-column (take-last 3 sample-1) 0 7)
-  (find-column (take-last 3 sample-2) 0 7)
-  (find-column (take-last 3 sample-3) 0 7)
-  (find-column (take-last 3 sample-4) 0 7)
-  )
+(find' (take-last 3 sample-1) (range 8))
+(find' (take-last 3 sample-2) (range 8))
+(find' (take-last 3 sample-3) (range 8))
+(find' (take-last 3 sample-4) (range 8))
+
+(defn find-seat [cs]
+  (let [row (find' (take 7 cs) (range 128))
+        col (find' (take-last 3 cs) (range 8))]
+    (+ (* row 8) col)))
+
+(find-seat sample-1)
+(find-seat sample-2)
+(find-seat sample-3)
+(find-seat sample-4)
+
+(defn part-1 []
+  (last (sort (map find-seat input))))
+
+(part-1)
