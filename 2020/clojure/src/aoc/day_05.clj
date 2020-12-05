@@ -1,5 +1,6 @@
 (ns aoc.day-05
-  (:require [aoc.util :refer [lines]]))
+  (:require [aoc.util :refer [lines]]
+            [clojure.set :as set]))
 
 (def sample-1 "FBFBBFFRLR")
 (def sample-2 "BFFFBBFRRR")
@@ -40,4 +41,10 @@
 (defn part-1 []
   (last (sort (map find-seat input))))
 
-(part-1)
+(defn part-2 []
+  (let [all-seats (set (range 32 914))
+        taken-seats (set (map find-seat input))]
+    (first (set/difference all-seats taken-seats))))
+
+(part-1) ;; 913
+(part-2) ;; 717
