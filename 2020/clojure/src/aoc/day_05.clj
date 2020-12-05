@@ -7,32 +7,24 @@
 (def sample-3 "FFFBBBFRRR")
 (def sample-4 "BBFFBBFRLL")
 
+(defn ->decimal [s]
+  (Integer/parseInt
+    (apply str (map {\F 0, \L 0, \B 1, \R 1} s)) 2))
+
 (def input (lines (slurp "../input/05")))
 
-(defn find' [[curr-char & more-chars] nums]
-  (let [middle (quot (count nums) 2)
-        [lower-half upper-half] (split-at middle nums)]
-    (case curr-char
-      \F (find' more-chars lower-half)
-      \L (find' more-chars lower-half)
-      \B (find' more-chars upper-half)
-      \R (find' more-chars upper-half)
-      (first nums))
-    ))
-
 (defn find-seat [chars]
-  (let [row (find' (take 7 chars) (range 128))
-        col (find' (take-last 3 chars) (range 8))]
+  (let [[row col] (map ->decimal (split-at 7 chars))]
     (+ (* row 8) col)))
 
 (defn part-1 []
-  (last (sort (map find-seat input))))
+  (apply max (map find-seat input)))
 
 (defn part-2 []
-  ;; all-seats found by eyeballin' min and max of taken-seats
-  ;; and hardcoding those numbers
-  (let [all-seats (set (range 32 914))
-        taken-seats (set (map find-seat input))]
+  (let [taken-seats (set (map find-seat input))
+        highest-taken-seat (apply max taken-seats)
+        lowest-taken-seat (apply min taken-seats)
+        all-seats (set (range lowest-taken-seat (inc highest-taken-seat)))]
     (first (set/difference all-seats taken-seats))))
 
 (comment
