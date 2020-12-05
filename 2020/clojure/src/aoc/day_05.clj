@@ -9,42 +9,38 @@
 
 (def input (lines (slurp "../input/05")))
 
-(defn find' [[c & cs] rows]
-  (let [[lower upper] (split-at (quot (count rows) 2) rows)]
-    (case c
-      \F (find' cs lower)
-      \L (find' cs lower)
-      \B (find' cs upper)
-      \R (find' cs upper)
-      (first rows))
+(defn find' [[curr-char & more-chars] nums]
+  (let [middle (quot (count nums) 2)
+        [lower-half upper-half] (split-at middle nums)]
+    (case curr-char
+      \F (find' more-chars lower-half)
+      \L (find' more-chars lower-half)
+      \B (find' more-chars upper-half)
+      \R (find' more-chars upper-half)
+      (first nums))
     ))
 
-(find' (take 7 sample-1) (range 128))
-(find' (take 7 sample-2) (range 128))
-(find' (take 7 sample-3) (range 128))
-
-(find' (take-last 3 sample-1) (range 8))
-(find' (take-last 3 sample-2) (range 8))
-(find' (take-last 3 sample-3) (range 8))
-(find' (take-last 3 sample-4) (range 8))
-
-(defn find-seat [cs]
-  (let [row (find' (take 7 cs) (range 128))
-        col (find' (take-last 3 cs) (range 8))]
+(defn find-seat [chars]
+  (let [row (find' (take 7 chars) (range 128))
+        col (find' (take-last 3 chars) (range 8))]
     (+ (* row 8) col)))
-
-(find-seat sample-1)
-(find-seat sample-2)
-(find-seat sample-3)
-(find-seat sample-4)
 
 (defn part-1 []
   (last (sort (map find-seat input))))
 
 (defn part-2 []
+  ;; all-seats found by eyeballin' min and max of taken-seats
+  ;; and hardcoding those numbers
   (let [all-seats (set (range 32 914))
         taken-seats (set (map find-seat input))]
     (first (set/difference all-seats taken-seats))))
 
-(part-1) ;; 913
-(part-2) ;; 717
+(comment
+  (find-seat sample-1) ;; 357
+  (find-seat sample-2) ;; 567
+  (find-seat sample-3) ;; 119
+  (find-seat sample-4) ;; 820
+
+  (part-1) ;; 913
+  (part-2) ;; 717
+  )
