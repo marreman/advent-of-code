@@ -13,33 +13,18 @@
    "faded blue bags contain no other bags."
    "dotted black bags contain no other bags."])
 
+(def input (str/split-lines (slurp "../input/07")))
+
+(defn parse-bag-contents [contents]
+  (let [[_ n bag] (re-find #"^(\d) (.*)$" contents)]
+    (repeat (read-string n) bag)))
+
 (defn parse-bag [s]
   (let [bags (str/split s #" bags contain | bags?, | bags?\.|no other")]
-    [(first bags) (map #(subs % 2) (rest bags))]))
+    [(first bags) (map parse-bag-contents (rest bags))]))
 
 (defn parse-bags [s]
   (apply hash-map (mapcat parse-bag s)))
 
-(defn look-in-bag [target contents]
-  (loop [contents contents
-         hits-so-far 0]
-    (let [{new-hits true other-bags false} (group-by (partial = target) contents)
-          total-hits (+ hits-so-far (count new-hits))]
-      (pprint {:target target
-               :contents contents
-               :hits-so-far hits-so-far
-               :new-hits new-hits
-               :other-bags other-bags})
-      (if (empty? other-bags)
-        total-hits
-        (do
-          (println "Wants to recur")
-          (println [other-bags total-hits]))
-        #_(recur other-bags total-hits)))))
-
-(defn part-1 [target unparsed-bags]
-  (let [bags (parse-bags unparsed-bags)]
-    (map #(look-in-bag target %) (vals bags))))
-
 (comment
-  (part-1 "shiny gold" sample))
+  (pprint (parse-bags sample)))
