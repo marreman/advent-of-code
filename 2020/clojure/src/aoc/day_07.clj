@@ -1,5 +1,6 @@
 (ns aoc.day-07
-  (:require [clojure.string :as str]))
+  (:require [clojure.string :as str]
+            [clojure.pprint :refer [pprint]]))
 
 (def sample
   ["light red bags contain 1 bright white bag, 2 muted yellow bags."
@@ -12,27 +13,33 @@
    "faded blue bags contain no other bags."
    "dotted black bags contain no other bags."])
 
-(def available-bag-types
-  ["light red"
-   "dark orange"
-   "bright white"
-   "muted yellow"
-   "shiny gold"
-   "dark olive"
-   "vibrant plum"
-   "faded blue"
-   "dotted black"])
+(defn parse-bag [s]
+  (let [bags (str/split s #" bags contain | bags?, | bags?\.|no other")]
+    [(first bags) (map #(subs % 2) (rest bags))]))
 
-(defn parse-rule [s]
-  (let [bags (re-seq (re-pattern (str/join "|" available-bag-types)) s)]
-    [(first bags) (rest bags)]))
+(defn parse-bags [s]
+  (apply hash-map (mapcat parse-bag s)))
 
-(defn parse-rules [s]
-  (apply hash-map (mapcat parse-rule s)))
+(defn look-in-bag [target contents]
+  (loop [contents contents
+         hits-so-far 0]
+    (let [{new-hits true other-bags false} (group-by (partial = target) contents)
+          total-hits (+ hits-so-far (count new-hits))]
+      (pprint {:target target
+               :contents contents
+               :hits-so-far hits-so-far
+               :new-hits new-hits
+               :other-bags other-bags})
+      (if (empty? other-bags)
+        total-hits
+        (do
+          (println "Wants to recur")
+          (println [other-bags total-hits]))
+        #_(recur other-bags total-hits)))))
 
-(defn part-1 [s]
-  (let [rules (parse-rules s)]
-    rules))
+(defn part-1 [target unparsed-bags]
+  (let [bags (parse-bags unparsed-bags)]
+    (map #(look-in-bag target %) (vals bags))))
 
 (comment
-  (part-1 sample))
+  (part-1 "shiny gold" sample))
