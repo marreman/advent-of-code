@@ -17,14 +17,24 @@
 
 (defn parse-bag-contents [contents]
   (let [[_ n bag] (re-find #"^(\d) (.*)$" contents)]
-    (repeat (read-string n) bag)))
+    [bag (read-string n)]))
 
 (defn parse-bag [s]
   (let [bags (str/split s #" bags contain | bags?, | bags?\.|no other")]
-    [(first bags) (map parse-bag-contents (rest bags))]))
+    [(first bags) (apply hash-map (mapcat parse-bag-contents (rest bags)))]))
 
 (defn parse-bags [s]
   (apply hash-map (mapcat parse-bag s)))
 
+(defn part-1 [all-bags init-targets]
+  (loop [found-so-far []
+         targets init-targets]
+    (let [found (filter #(some (set targets) (keys (second %))) all-bags)
+          found-in-total (concat found-so-far (keys found))]
+      (if (empty? found)
+        (count (set found-in-total))
+        (recur found-in-total (keys found))))))
+
 (comment
-  (pprint (parse-bags sample)))
+  (part-1 (parse-bags input) ["shiny gold"]) ;; 274
+  )
