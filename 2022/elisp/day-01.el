@@ -1,8 +1,4 @@
-(defun slurp (filename)
-  "Return the contents of the file with name FILENAME as a string."
-  (with-temp-buffer
-    (insert-file-contents filename)
-    (buffer-string)))
+(load-file "helpers.el")
 
 (defvar example-input (slurp "../input/01-example"))
 (defvar my-input (slurp "../input/01"))
